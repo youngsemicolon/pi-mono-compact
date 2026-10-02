@@ -11,6 +11,7 @@ session itself: `demo-provider.ts` is an extension that registers a deterministi
 | `demo-project/` | Fixture project with the bug. Copied into a temporary `HOME` for every run. |
 | `capture.sh` | Runs one session in an isolated tmux server and `HOME` with a clean environment, and captures each scene as `.ansi`, `.txt`, and `.png`. |
 | `capture-all.sh` | Runs `capture.sh` for upstream and the fork (dark, light, tall, regular mode), renders side-by-side comparisons, and counts transcript lines. |
+| `verify-extension.sh` | Installs the Pi package with `pi install` into a clean, isolated Pi setup, runs a scripted session, checks the result (compact blocks, monochrome theme, unchanged tool set and saved settings), and removes it again. |
 | `ansi-to-png.mjs` | Renders `tmux capture-pane -e` output to HTML and, with playwright-core, to PNG. |
 | `screenshots/` | The committed evidence set. |
 
@@ -37,6 +38,13 @@ Single session, for example the light theme in a 120x40 terminal:
 
 ```bash
 COLS=120 ROWS=40 THEME=mono-light compact/capture.sh . /tmp/out "pi-mono-compact"
+```
+
+To verify the Pi package against stock Pi in a clean setup:
+
+```bash
+npm install -g --prefix /tmp/stock-pi @earendil-works/pi-coding-agent
+compact/verify-extension.sh /tmp/stock-pi/bin/pi git:github.com/youngsemicolon/pi-mono-compact@pi-package /tmp/verify
 ```
 
 To try the demo interactively: `./pi-test.sh -e compact/demo-provider.ts --provider demo --model demo-1`

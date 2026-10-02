@@ -12,6 +12,22 @@
 
 > **Unofficial fork** of [earendil-works/pi](https://github.com/earendil-works/pi), the Pi agent harness by Mario Zechner and contributors, forked at upstream commit [`0495646a8`](https://github.com/earendil-works/pi/commit/0495646a8322ff99ce40ac2f9e15f1f49f56bb11). It changes only how the interactive terminal UI looks: monochromatic and vertically compact, with density and restraint closer to Claude Code. Features, commands, keybindings, settings, packages, and the Pi name and logo are unchanged. Distributed under the same [MIT License](LICENSE) with the upstream copyright notice. This fork is not affiliated with or endorsed by the upstream project; report problems with it here, not upstream.
 
+## Install the extension
+
+Already using Pi? Add the monochrome themes and compact tool blocks to your existing installation:
+
+```bash
+pi install git:github.com/youngsemicolon/pi-mono-compact@pi-package
+```
+
+Then start Pi, or run `/reload` in a session that is already open. Nothing else needs configuring. The theme switches to `mono-dark` or `mono-light` to match your current theme's appearance, without changing your saved `theme` setting, and the built-in tools render as compact blocks. To uninstall:
+
+```bash
+pi remove git:github.com/youngsemicolon/pi-mono-compact
+```
+
+The extension is the [`extension/`](extension/README.md) package, published on the [`pi-package`](https://github.com/youngsemicolon/pi-mono-compact/tree/pi-package) branch. It was tested with stock Pi 1.0.0 in a clean setup ([results](compact/screenshots/extension-verify.txt)). Prompt, dialog, `!` command, startup, and footer compaction need the full fork below, because extensions cannot change those parts of Pi.
+
 ![Before and after: the same scripted session in a 100x62 terminal](compact/screenshots/compare-session.png)
 
 ## What changed
