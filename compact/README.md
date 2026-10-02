@@ -12,6 +12,7 @@ session itself: `demo-provider.ts` is an extension that registers a deterministi
 | `capture.sh` | Runs one session in an isolated tmux server and `HOME` with a clean environment, and captures each scene as `.ansi`, `.txt`, and `.png`. |
 | `capture-all.sh` | Runs `capture.sh` for upstream and the fork (dark, light, tall, regular mode), renders side-by-side comparisons, and counts transcript lines. |
 | `verify-extension.sh` | Installs the Pi package with `pi install` into a clean, isolated Pi setup, runs a scripted session, checks the result (compact blocks, monochrome theme, unchanged tool set and saved settings), and removes it again. |
+| `capture-header.sh` | Captures the startup header of several pi commands (e.g. an older release and this fork) in isolated, clean setups and stacks them into one image. |
 | `ansi-to-png.mjs` | Renders `tmux capture-pane -e` output to HTML and, with playwright-core, to PNG. |
 | `screenshots/` | The committed evidence set. |
 

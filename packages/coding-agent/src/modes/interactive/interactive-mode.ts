@@ -158,7 +158,6 @@ import {
 	formatAuthSelectorProviderType,
 	OAuthSelectorComponent,
 } from "./components/oauth-selector.ts";
-import { piLogoLines, piWordmark, supportsPiLogo } from "./components/pi-logo.ts";
 import { createLoginMenuSelector } from "./components/radius-login-selector.ts";
 import { ScopedModelsSelectorComponent } from "./components/scoped-models-selector.ts";
 import { SessionSelectorComponent } from "./components/session-selector.ts";
@@ -250,12 +249,14 @@ class ExpandableText extends ThemedText implements Expandable {
 	}
 }
 
-/** The built-in header. Clicking its logo (the first two lines, after one column of padding) plays an easter egg. */
+/** The built-in header. Clicking the pi wordmark (first line, after one column of padding) plays an easter egg. */
 class BuiltInHeader extends ExpandableText {
 	onLogoClick: ((column: number, row: number) => void) | undefined;
 
 	handleMouse(event: TuiMouseEvent): TuiMouseEventResult | undefined {
-		if (event.type !== "click" || event.y > 1 || event.x < 1 || event.x > 4 || !this.onLogoClick) return undefined;
+		if (event.type !== "click" || event.y !== 0 || event.x < 1 || event.x > APP_NAME.length || !this.onLogoClick) {
+			return undefined;
+		}
 		this.onLogoClick(event.screenX - event.x + 1, event.screenY - event.y);
 		return { handled: true };
 	}
@@ -992,15 +993,9 @@ export class InteractiveMode {
 		// Add header with keybindings from config (unless silenced)
 		if (this.shouldShowStartupHeader()) {
 			const showDetails = this.shouldShowStartupDetails();
-			// Built on demand so the header follows theme changes. The logo's first line carries the version,
-			// its second line the first line of key hints. Terminals that cannot render the logo get a
-			// "Pi vX" line instead, with the key hints below it.
-			const showLogo = supportsPiLogo();
-			const withLogo = (hints: string) => {
-				if (!showLogo) return `${piWordmark()} ${theme.fg("dim", `v${this.version}`)}\n${hints}`;
-				const [top, bottom] = piLogoLines();
-				return `${top} ${theme.fg("dim", `v${this.version}`)}\n${bottom} ${hints}`;
-			};
+			// Built on demand so the header follows theme changes. The first line is the pi wordmark as it was
+			// before v1 (v0.18 through v0.87): the app name in bold accent, then the version. Key hints follow.
+			const logo = () => theme.bold(theme.fg("accent", APP_NAME)) + theme.fg("dim", ` v${this.version}`);
 
 			// Build startup instructions using keybinding hint helpers
 			const hint = (keybinding: AppKeybinding, description: string) => keyHint(keybinding, description);
@@ -1046,13 +1041,13 @@ export class InteractiveMode {
 			const onboarding = () =>
 				theme.fg("dim", `Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.`);
 			const header = new BuiltInHeader(
-				() => `${withLogo(compactInstructions())}\n${compactOnboarding()}\n${onboarding()}`,
-				() => `${withLogo(expandedInstructions())}\n${onboarding()}`,
+				() => `${logo()}\n${compactInstructions()}\n${compactOnboarding()}\n${onboarding()}`,
+				() => `${logo()}\n${expandedInstructions()}\n${onboarding()}`,
 				this.getStartupExpansionState(),
 				1,
 				0,
 			);
-			if (showLogo) header.onLogoClick = (column, row) => playPiLogo3d(this.renderer, column, row);
+			header.onLogoClick = (column, row) => playPiLogo3d(this.renderer, column, row);
 			this.builtInHeader = header;
 
 			// Setup UI layout: the header starts on the first row, and one blank line separates it from what follows.

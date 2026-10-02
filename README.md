@@ -10,7 +10,7 @@
 
 # pi-mono-compact
 
-> **Unofficial fork** of [earendil-works/pi](https://github.com/earendil-works/pi), the Pi agent harness by Mario Zechner and contributors, forked at upstream commit [`0495646a8`](https://github.com/earendil-works/pi/commit/0495646a8322ff99ce40ac2f9e15f1f49f56bb11). It changes only how the interactive terminal UI looks: monochromatic and vertically compact, with density and restraint closer to Claude Code. Features, commands, keybindings, settings, packages, and the Pi name and logo are unchanged. Distributed under the same [MIT License](LICENSE) with the upstream copyright notice. This fork is not affiliated with or endorsed by the upstream project; report problems with it here, not upstream.
+> **Unofficial fork** of [earendil-works/pi](https://github.com/earendil-works/pi), the Pi agent harness by Mario Zechner and contributors, forked at upstream commit [`0495646a8`](https://github.com/earendil-works/pi/commit/0495646a8322ff99ce40ac2f9e15f1f49f56bb11). It changes only how the interactive terminal UI looks: monochromatic and vertically compact, with density and restraint closer to Claude Code. Features, commands, keybindings, settings, packages, and the Pi name are unchanged, and the startup header shows the `pi` wordmark it had before v1. Distributed under the same [MIT License](LICENSE) with the upstream copyright notice. This fork is not affiliated with or endorsed by the upstream project; report problems with it here, not upstream.
 
 ## Install the extension
 
@@ -26,14 +26,14 @@ Then start Pi, or run `/reload` in a session that is already open. Nothing else 
 pi remove git:github.com/youngsemicolon/pi-mono-compact
 ```
 
-The extension is the [`extension/`](extension/README.md) package, published on the [`pi-package`](https://github.com/youngsemicolon/pi-mono-compact/tree/pi-package) branch. It was tested with stock Pi 1.0.0 in a clean setup ([results](compact/screenshots/extension-verify.txt), [screenshot](compact/screenshots/extension-running.png)). Prompt, dialog, `!` command, startup, and footer compaction need the full fork below, because extensions cannot change those parts of Pi.
+The extension is the [`extension/`](extension/README.md) package, published on the [`pi-package`](https://github.com/youngsemicolon/pi-mono-compact/tree/pi-package) branch. It was tested with stock Pi 1.0.0 in a clean setup ([results](compact/screenshots/extension-verify.txt), [screenshot](compact/screenshots/extension-running.png)). The full fork below also compacts prompts, dialogs, `!` commands, the startup header, and the footer, and restores the pre-v1 `pi` wordmark. Extensions cannot reach prompts, dialogs, or `!` commands, and replacing the header or footer from an extension would mean reimplementing them.
 
 ![Before and after: the same scripted session in a 100x62 terminal](compact/screenshots/compare-session.png)
 
 ## What changed
 
 - **Monochrome by default.** New `mono-dark` and `mono-light` themes, picked by the terminal's light/dark appearance (the default setting behaves like `"theme": "mono-light/mono-dark"`). Emphasis comes from lightness, bold, and glyph shape instead of hue. The colored `system`, `dark`, and `light` themes are still available in `/settings`.
-- **Recognizable branding.** The pi logo keeps its shape and three-part structure, drawn in the theme's grays under monochrome themes and in its brand colors under colored themes.
+- **The pre-v1 `pi` logo.** The startup header's first line is the wordmark Pi used from v0.18 through v0.87: `pi` in bold, followed by the version, with the key hints below. It replaces the two-line pixel logo that v0.99 introduced, and takes the theme's accent color (bright under the mono themes, violet under `dark`). See the [header in v0.87.1, v1.0.0, and this fork](compact/screenshots/header-history.png).
 - **Compact tool calls.** A tool call is one header line with a status glyph (`○` running, `●` done, `✗` failed), and its result hangs below behind a `⎿` gutter. The padded, colored panel and the blank lines inside it are gone. User `!` commands use the same layout instead of a bordered box.
 - **Less vertical padding.** User prompts are a single shaded row instead of three. Startup hints, loaded resources (one line per section when collapsed), custom/compaction/branch messages, dialogs (no padding inside their borders), and the settings list lose decorative blank lines.
 - **One-line footer** when the directory, token stats, and model fit the width; it falls back to the two upstream lines otherwise.

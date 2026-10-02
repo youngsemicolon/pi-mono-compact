@@ -4,7 +4,8 @@
 
 ### Changed
 
-- Changed the default theme to the new monochrome `mono-dark`/`mono-light` pair, picked by terminal appearance like a `mono-light/mono-dark` setting. The colored `system`, `dark`, and `light` themes stay selectable, and the logo keeps its brand colors under them.
+- Changed the default theme to the new monochrome `mono-dark`/`mono-light` pair, picked by terminal appearance like a `mono-light/mono-dark` setting. The colored `system`, `dark`, and `light` themes stay selectable.
+- Restored the startup header's pre-v1 wordmark: the first line shows `pi` in bold accent followed by the version, as from v0.18 through v0.87, instead of the two-line pixel logo added in v0.99.0. The key hints follow on the next line, and clicking the wordmark still plays the logo easter egg.
 - Changed tool calls to compact blocks: a status glyph (`○` running, `●` done, `✗` failed) before the call and the result behind a `⎿` gutter, without the padded colored panel or the blank lines inside it. User `!` commands use the same layout.
 - Removed decorative vertical spacing: user prompts, custom and summary messages lose their panel padding, the startup header and loaded-resource sections lose their blank lines (collapsed sections fit on one line), dialogs lose the padding inside their borders, and the footer fits on one line when the directory, stats, and model fit the width.
 - Selected list items are bold in addition to the accent color, so focus does not depend on hue.

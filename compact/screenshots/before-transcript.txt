@@ -46,7 +46,7 @@
  ℹ cancelled 0
  ℹ skipped 0
  ℹ todo 0
- ℹ duration_ms 163.694956
+ ℹ duration_ms 158.158703
 
  Took 0.3s
 
@@ -89,7 +89,7 @@
 
  ...
 
- Took 4.2s
+ Took 4.3s
 
 
  Still green: 3/3 tests pass.

@@ -6,8 +6,6 @@ Themes control the colors Pi uses in interactive mode and HTML exports. Pi inclu
 
 Without a `theme` setting, Pi uses the monochrome pair: `mono-dark` on dark terminals and `mono-light` on light ones, as if the setting were `"mono-light/mono-dark"`. Both use grays only. Emphasis comes from lightness, bold text, and glyphs instead of hue: tool calls show `○` while running, `●` when done, and `✗` when they failed, and diffs mark lines with `+` and `-`.
 
-Under a monochrome theme the logo is drawn in the theme's grays. Under the colored themes it keeps its brand colors.
-
 ## Use your terminal's colors
 
 The `system` theme builds Pi's colors from your terminal's theme, so Pi matches the terminal instead of bringing its own palette:

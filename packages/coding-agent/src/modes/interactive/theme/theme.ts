@@ -240,9 +240,6 @@ function detectAppearance(foregrounds: Color[], backgrounds: Color[]): ThemeAppe
 // Theme Class
 // ============================================================================
 
-/** OKLCH chroma below which a color reads as gray. */
-const MONOCHROME_MAX_CHROMA = 0.02;
-
 export class Theme {
 	readonly name?: string;
 	readonly sourcePath?: string;
@@ -258,8 +255,6 @@ export class Theme {
 	// Foreground tokens rendered faint (SGR 2) on top of their color.
 	private readonly dimTokens: ReadonlySet<ThemeColor>;
 	private readonly ownAppearance: ThemeAppearance | undefined;
-	/** Whether every concrete color is a gray. Brand artwork such as the logo renders in grays under such themes. */
-	readonly monochrome: boolean;
 	private resolvedColors: { terminal: TerminalColors; colors: Readonly<Record<ThemeToken, Color>> } | undefined;
 
 	constructor(
@@ -310,9 +305,6 @@ export class Theme {
 			this.bgAnsi.set(token, addToken(token, value, true));
 		}
 		this.ownAppearance = options.appearance ?? detectAppearance(concreteForegrounds, concreteBackgrounds);
-		this.monochrome = [...concreteForegrounds, ...concreteBackgrounds].every(
-			(color) => colorToOklch(color).c < MONOCHROME_MAX_CHROMA,
-		);
 	}
 
 	/**

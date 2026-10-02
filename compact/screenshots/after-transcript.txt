@@ -1,5 +1,5 @@
- ▀▀█  v1.0.0
- █▀ █ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
+ pi v1.0.0
+ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
  Press ctrl+o to show full startup help and loaded resources.
  Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.
 
@@ -34,8 +34,8 @@
      ℹ cancelled 0
      ℹ skipped 0
      ℹ todo 0
-     ℹ duration_ms 160.668591
-     Took 0.2s
+     ℹ duration_ms 173.51317
+     Took 0.3s
 
  Fixed the off-by-one in range(): the loop used < against an inclusive end, so the last value was
  dropped.
@@ -66,11 +66,11 @@
 
  ● $ sleep 4 && node --test --test-reporter=dot
    ⎿ ...
-     Took 4.2s
+     Took 4.3s
 
  Still green: 3/3 tests pass.
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────
-~/demo (master) · ↑2.0k ↓325 R8.5k W2.0k CH96.5% 1.0%/200k (auto)                    demo-1 • medium
+~/demo (master) · ↑2.0k ↓325 R8.5k W2.0k CH96.6% 1.0%/200k (auto)                    demo-1 • medium

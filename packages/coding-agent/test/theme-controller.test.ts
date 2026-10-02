@@ -1,4 +1,4 @@
-import type { TerminalColors, TUI } from "@earendil-works/pi-tui";
+import { colorToOklch, type TerminalColors, type TUI } from "@earendil-works/pi-tui";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { SettingsManager } from "../src/core/settings-manager.ts";
 import {
@@ -49,6 +49,11 @@ function createController(ui: TUI, getSettingsManager: () => SettingsManager, in
 }
 
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+/** Every color of the active theme is a gray. */
+function expectGrayscale(): void {
+	for (const color of Object.values(theme.colors)) expect(colorToOklch(color).c).toBeLessThan(0.02);
+}
 
 afterEach(() => {
 	setTerminalColors({});
@@ -135,14 +140,14 @@ describe("InteractiveThemeController", () => {
 		expect(setTerminalColorSchemeNotifications).toHaveBeenCalledWith(true);
 		await flush();
 		expect(theme.name).toBe("mono-light");
-		expect(theme.monochrome).toBe(true);
+		expectGrayscale();
 		expect(controller.getThemeSelection()).toBe("mono-light/mono-dark");
 
 		queryTerminalColors.mockResolvedValue(DARK);
 		emitTerminalColorScheme("dark");
 		await flush();
 		expect(theme.name).toBe("mono-dark");
-		expect(theme.monochrome).toBe(true);
+		expectGrayscale();
 	});
 
 	it("uses the reported scheme for the system theme when the terminal reports no colors", async () => {

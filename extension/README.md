@@ -30,8 +30,9 @@ pi remove git:github.com/youngsemicolon/pi-mono-compact
 
 To use only one of the two, disable the other extension (`mono-theme.ts` or `compact-tools.ts`) with `pi config`.
 
-The full fork additionally removes padding from prompts, dialogs, `!` commands, the startup header, and the
-footer, which an extension cannot change.
+The full fork also compacts prompts, dialogs, `!` commands, the startup header, and the footer, and restores the
+pre-v1 `pi` wordmark in the header. Extensions cannot reach prompts, dialogs, or `!` commands, and replacing the
+header or footer from an extension would mean reimplementing them.
 
 ## License
 

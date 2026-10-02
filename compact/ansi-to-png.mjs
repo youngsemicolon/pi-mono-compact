@@ -2,7 +2,8 @@
 // Renders `tmux capture-pane -e -p` dumps (ANSI SGR) to HTML and, when playwright-core is
 // resolvable, to PNG via headless Chromium. Several panes render side by side.
 //
-// Usage: node ansi-to-png.mjs <output.png> [--light] (--pane <input.ansi> [--title T] [--cursor X,Y])...
+// Usage: node ansi-to-png.mjs <output.png> [--light] [--stack] (--pane <input.ansi> [--title T] [--cursor X,Y])...
+//        --stack places panes below each other instead of side by side.
 // Env:   PLAYWRIGHT_CORE (path to playwright-core), CHROMIUM (executable path)
 
 import { readFileSync, writeFileSync } from "node:fs";
@@ -11,6 +12,7 @@ import { createRequire } from "node:module";
 const args = process.argv.slice(2);
 const output = args[0];
 const light = args.includes("--light");
+const stack = args.includes("--stack");
 const panes = [];
 for (let i = 1; i < args.length; i++) {
 	if (args[i] === "--pane") panes.push({ input: args[++i], title: "", cursor: undefined });
@@ -122,7 +124,7 @@ function renderPane({ input, title, cursor }) {
 const chrome = light ? "#e6e6e6" : "#2a2a2a";
 const html = `<!doctype html><html><head><meta charset="utf-8"><style>
 :root{--lh:19px}
-body{margin:0;background:${light ? "#d0d0d0" : "#0b0b0b"};padding:18px;display:inline-flex;gap:18px;align-items:flex-start}
+body{margin:0;background:${light ? "#d0d0d0" : "#0b0b0b"};padding:18px;display:inline-flex;flex-direction:${stack ? "column" : "row"};gap:18px;align-items:flex-start}
 .win{border-radius:8px;overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.35);background:${DEFAULT_BG}}
 .bar{height:26px;background:${chrome};display:flex;align-items:center;gap:7px;padding:0 10px;font:12px system-ui,sans-serif;color:${light ? "#555" : "#aaa"}}
 .dot{width:11px;height:11px;border-radius:50%;background:${light ? "#bbb" : "#555"}}
