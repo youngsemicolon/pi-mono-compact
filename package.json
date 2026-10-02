@@ -1,0 +1,27 @@
+{
+	"name": "pi-mono-compact",
+	"version": "1.0.0",
+	"description": "Monochrome themes and compact tool blocks for the Pi coding agent",
+	"type": "module",
+	"license": "MIT",
+	"keywords": [
+		"pi-package"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/youngsemicolon/pi-mono-compact.git"
+	},
+	"pi": {
+		"extensions": [
+			"./extensions/mono-theme.ts",
+			"./extensions/compact-tools.ts"
+		],
+		"themes": [
+			"./themes/*.json"
+		]
+	},
+	"peerDependencies": {
+		"@earendil-works/pi-coding-agent": "*",
+		"@earendil-works/pi-tui": "*"
+	}
+}
