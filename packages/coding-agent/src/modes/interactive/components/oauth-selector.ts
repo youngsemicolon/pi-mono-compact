@@ -95,7 +95,6 @@ export class OAuthSelectorComponent extends Container implements Focusable {
 
 		// Add top border
 		this.addChild(new DynamicBorder());
-		this.addChild(new Spacer(1));
 
 		// Add title
 		const title = mode === "login" ? "Select provider to configure:" : "Select provider to logout:";

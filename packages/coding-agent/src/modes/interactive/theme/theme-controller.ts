@@ -1,6 +1,8 @@
 import type { RgbColor, TerminalColors, TUI } from "@earendil-works/pi-tui";
 import type { SettingsManager } from "../../../core/settings-manager.ts";
 import {
+	DEFAULT_THEME_SETTING,
+	getDefaultThemeName,
 	getTerminalTheme,
 	initTheme,
 	markTerminalColorsPending,
@@ -103,7 +105,9 @@ export class InteractiveThemeController {
 	applyFromSettings(): void {
 		const themeSetting = this.getThemeSetting();
 		const themeName = this.resolveThemeName();
-		this.setAutoSync(parseAutoThemeSetting(themeSetting) !== undefined || themeName === SYSTEM_THEME_NAME);
+		this.setAutoSync(
+			parseAutoThemeSetting(themeSetting ?? DEFAULT_THEME_SETTING) !== undefined || themeName === SYSTEM_THEME_NAME,
+		);
 		this.applyThemeName(themeName, themeSetting !== undefined);
 		this.queryTerminalColors();
 	}
@@ -118,7 +122,10 @@ export class InteractiveThemeController {
 	}
 
 	getThemeSelection(): string | undefined {
-		return this.currentThemeSetting ?? this.getSettingsManager().getThemeSetting() ?? this.activeThemeName;
+		const setting = this.currentThemeSetting ?? this.getSettingsManager().getThemeSetting();
+		if (setting !== undefined) return setting;
+		// Without a setting, the default pair is active unless an extension replaced the theme.
+		return this.activeThemeName === this.resolveThemeName() ? DEFAULT_THEME_SETTING : this.activeThemeName;
 	}
 
 	setThemeName(themeName: string, showError = false): ThemeResult {
@@ -170,17 +177,20 @@ export class InteractiveThemeController {
 		return this.currentThemeSetting ?? this.getSettingsManager().getThemeSetting();
 	}
 
-	/** The theme for the current setting and terminal appearance. Without a setting, pi uses the system theme. */
+	/** The theme for the current setting and terminal appearance. Without a setting, pi uses the monochrome pair. */
 	private resolveThemeName(): string {
-		return resolveThemeSetting(this.getThemeSetting(), getTerminalTheme()) ?? SYSTEM_THEME_NAME;
+		return (
+			resolveThemeSetting(this.getThemeSetting() ?? DEFAULT_THEME_SETTING, getTerminalTheme()) ??
+			getDefaultThemeName()
+		);
 	}
 
 	private applyThemeName(themeName: string, showError = false): ThemeResult {
 		const result = setTheme(themeName, true);
-		this.activeThemeName = result.success ? themeName : SYSTEM_THEME_NAME;
+		this.activeThemeName = result.success ? themeName : getDefaultThemeName();
 		this.notifyChanged();
 		if (!result.success && showError) {
-			this.showError(`Failed to load theme "${themeName}": ${result.error}\nFell back to the system theme.`);
+			this.showError(`Failed to load theme "${themeName}": ${result.error}\nFell back to the default theme.`);
 		}
 		return result;
 	}

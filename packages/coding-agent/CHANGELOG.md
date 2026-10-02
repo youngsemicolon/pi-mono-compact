@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Changed the default theme to the new monochrome `mono-dark`/`mono-light` pair, picked by terminal appearance like a `mono-light/mono-dark` setting. The colored `system`, `dark`, and `light` themes stay selectable, and the logo keeps its brand colors under them.
+- Changed tool calls to compact blocks: a status glyph (`○` running, `●` done, `✗` failed) before the call and the result behind a `⎿` gutter, without the padded colored panel or the blank lines inside it. User `!` commands use the same layout.
+- Removed decorative vertical spacing: user prompts, custom and summary messages lose their panel padding, the startup header and loaded-resource sections lose their blank lines (collapsed sections fit on one line), dialogs lose the padding inside their borders, and the footer fits on one line when the directory, stats, and model fit the width.
+- Selected list items are bold in addition to the accent color, so focus does not depend on hue.
+
 ### Added
 
 - Added a copy key (`app.message.copy`, default `ctrl+x`) to OAuth sign-in screens in `/login`, `/mcp`, and `/mcp login`, which copies the sign-in URL when the browser cannot be opened or the wrapped link cannot be selected.

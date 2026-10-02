@@ -1,5 +1,6 @@
 import { Container, getKeybindings, Spacer, Text } from "@earendil-works/pi-tui";
 import { APP_NAME } from "../../../config.ts";
+import { DEFAULT_THEME_SETTING } from "../theme/default-theme.ts";
 import { SYSTEM_THEME_NAME } from "../theme/system-theme.ts";
 import { theme } from "../theme/theme.ts";
 import { DynamicBorder } from "./dynamic-border.ts";
@@ -17,6 +18,7 @@ export interface FirstTimeSetupOptions {
 }
 
 const THEME_OPTIONS: Array<{ value: string; label: string }> = [
+	{ value: DEFAULT_THEME_SETTING, label: "Mono (follows terminal light/dark)" },
 	{ value: SYSTEM_THEME_NAME, label: "System (matches your terminal colors)" },
 	{ value: "dark", label: "Dark" },
 	{ value: "light", label: "Light" },
@@ -53,7 +55,6 @@ export class FirstTimeSetupComponent extends Container {
 	private update(): void {
 		this.clear();
 		this.addChild(new DynamicBorder());
-		this.addChild(new Spacer(1));
 		this.addChild(new Text(theme.fg("accent", SETUP_LOGO_LINES.join("\n")), 1, 0));
 		this.addChild(new Spacer(1));
 		this.addChild(
@@ -99,7 +100,6 @@ export class FirstTimeSetupComponent extends Container {
 				0,
 			),
 		);
-		this.addChild(new Spacer(1));
 		this.addChild(new DynamicBorder());
 	}
 

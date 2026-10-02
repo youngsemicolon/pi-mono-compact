@@ -8,6 +8,64 @@
   <a href="https://www.npmjs.com/package/@earendil-works/pi-coding-agent"><img alt="npm" src="https://img.shields.io/npm/v/@earendil-works/pi-coding-agent?style=flat-square" /></a>
 </p>
 
+# pi-mono-compact
+
+> **Unofficial fork** of [earendil-works/pi](https://github.com/earendil-works/pi), the Pi agent harness by Mario Zechner and contributors, forked at upstream commit [`0495646a8`](https://github.com/earendil-works/pi/commit/0495646a8322ff99ce40ac2f9e15f1f49f56bb11). It changes only how the interactive terminal UI looks: monochromatic and vertically compact, with density and restraint closer to Claude Code. Features, commands, keybindings, settings, packages, and the Pi name and logo are unchanged. Distributed under the same [MIT License](LICENSE) with the upstream copyright notice. This fork is not affiliated with or endorsed by the upstream project; report problems with it here, not upstream.
+
+![Before and after: the same scripted session in a 100x62 terminal](compact/screenshots/compare-session.png)
+
+## What changed
+
+- **Monochrome by default.** New `mono-dark` and `mono-light` themes, picked by the terminal's light/dark appearance (the default setting behaves like `"theme": "mono-light/mono-dark"`). Emphasis comes from lightness, bold, and glyph shape instead of hue. The colored `system`, `dark`, and `light` themes are still available in `/settings`.
+- **Recognizable branding.** The pi logo keeps its shape and three-part structure, drawn in the theme's grays under monochrome themes and in its brand colors under colored themes.
+- **Compact tool calls.** A tool call is one header line with a status glyph (`○` running, `●` done, `✗` failed), and its result hangs below behind a `⎿` gutter. The padded, colored panel and the blank lines inside it are gone. User `!` commands use the same layout instead of a bordered box.
+- **Less vertical padding.** User prompts are a single shaded row instead of three. Startup hints, loaded resources (one line per section when collapsed), custom/compaction/branch messages, dialogs (no padding inside their borders), and the settings list lose decorative blank lines.
+- **One-line footer** when the directory, token stats, and model fit the width; it falls back to the two upstream lines otherwise.
+- **Keyboard focus without color.** Selected rows in lists and menus keep the `→` marker and are now also bold.
+
+Measured on the same scripted session at 100 columns ([transcripts](compact/screenshots)): **101 lines before, 76 after (-25%)**. A user prompt takes 1 row instead of 3, a tool call header 1 instead of 3, and the footer 1 instead of 2.
+
+| Startup | Settings |
+|---|---|
+| ![Startup](compact/screenshots/compare-startup.png) | ![Settings](compact/screenshots/compare-settings.png) |
+| **Running tool** | **Light theme** |
+| ![Running](compact/screenshots/compare-running.png) | ![Light](compact/screenshots/compare-light.png) |
+
+More scenes: [slash commands](compact/screenshots/after-commands.png), [expanded tool output](compact/screenshots/after-expanded.png), [model selector](compact/screenshots/after-model.png), [session tree](compact/screenshots/after-tree.png).
+
+## Use it
+
+Requires Node.js 22.19 or later.
+
+```bash
+git clone https://github.com/youngsemicolon/pi-mono-compact.git
+cd pi-mono-compact
+npm install --ignore-scripts
+npm run build
+
+# Run from this checkout, in any project directory
+/path/to/pi-mono-compact/pi-test.sh
+
+# Or run the built CLI, e.g. under its own alias so an installed upstream `pi` stays untouched
+alias pi-compact="node /path/to/pi-mono-compact/packages/coding-agent/dist/bundle/cli.js"
+```
+
+The fork reads the same configuration as upstream (`~/.pi/agent`), so logins, sessions, extensions, and skills carry over. An explicit `theme` in your `settings.json` still wins over the monochrome default:
+
+- Monochrome, following the terminal: `/settings` → **Theme** → **automatic** with `mono-light` and `mono-dark`, or `"theme": "mono-light/mono-dark"`.
+- Colors again: pick `system`, `dark`, or `light` in `/settings` → **Theme**, or run once with `--use-theme dark`.
+- `--tui-mode regular` keeps output in the terminal's scrollback instead of fullscreen; the compact layout applies to both.
+
+## Verification
+
+- `npm run build` and `npm run check` (biome, type check, dependency and bundle checks) pass.
+- `./test.sh` has no failures beyond those of unmodified upstream in the same environment (`find` tests need `fd`, and one bash truncation test fails under the isolated `LANG=C` test environment). Changed rendering is covered by updated tests and new ones in `packages/coding-agent/test/tool-block.test.ts`, `footer-width.test.ts`, `theme-controller.test.ts`, and `user-message.test.ts`.
+- [`compact/`](compact/README.md) contains the scripted, provider-free demo session and the tmux capture scripts that produced every screenshot above from both upstream and this fork.
+
+---
+
+The upstream README follows.
+
 > New issues and PRs from new contributors are auto-closed by default. Maintainers review auto-closed issues daily. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 # Pi Agent Harness

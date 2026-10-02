@@ -1,0 +1,3 @@
+transcript lines (100 columns, same scripted session):
+  before: 101
+  after:  76

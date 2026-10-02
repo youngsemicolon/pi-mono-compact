@@ -215,6 +215,7 @@ export class FooterComponent implements Component {
 		}
 
 		let statsLeft = statsParts.join(" ");
+		const fullStatsLeft = statsLeft;
 
 		// Add model name on the right side, plus thinking level if model supports it
 		const modelName = state.model?.id || "no-model";
@@ -244,10 +245,64 @@ export class FooterComponent implements Component {
 			rightSideWithoutProvider += ` → ${routed.model.id}${level}`;
 		}
 
+		const rightSideWithProvider =
+			this.footerData.getAvailableProviderCount() > 1 && state.model
+				? `(${state.model.provider}) ${rightSideWithoutProvider}`
+				: undefined;
+
+		// Compact layout: everything on one line when the directory, stats, and model fit.
+		const combinedLeft = `${pwd} · ${fullStatsLeft}`;
+		const combinedLeftWidth = visibleWidth(combinedLeft);
+		const singleLineRight = [rightSideWithProvider, rightSideWithoutProvider].find(
+			(right) => right !== undefined && combinedLeftWidth + minPadding + visibleWidth(right) <= width,
+		);
+		const lines: string[] = [];
+		if (singleLineRight !== undefined) {
+			const padding = " ".repeat(width - combinedLeftWidth - visibleWidth(singleLineRight));
+			// Dimmed in two parts: the stats may contain a colored context percentage that ends with a reset.
+			lines.push(theme.fg("dim", combinedLeft) + theme.fg("dim", padding + singleLineRight));
+		} else {
+			lines.push(
+				...this.renderTwoLines(
+					width,
+					pwd,
+					statsLeft,
+					statsLeftWidth,
+					rightSideWithoutProvider,
+					rightSideWithProvider,
+				),
+			);
+		}
+
+		// Add extension statuses on a single line, sorted by key alphabetically
+		const extensionStatuses = this.footerData.getExtensionStatuses();
+		if (extensionStatuses.size > 0) {
+			const sortedStatuses = Array.from(extensionStatuses.entries())
+				.sort(([a], [b]) => a.localeCompare(b))
+				.map(([, text]) => sanitizeStatusText(text));
+			const statusLine = sortedStatuses.join(" ");
+			// Truncate to terminal width with dim ellipsis for consistency with footer style
+			lines.push(truncateToWidth(statusLine, width, theme.fg("dim", "...")));
+		}
+
+		return lines;
+	}
+
+	/** The directory on the first line; stats and the model on the second. Used when one line is too narrow. */
+	private renderTwoLines(
+		width: number,
+		pwd: string,
+		statsLeft: string,
+		statsLeftWidth: number,
+		rightSideWithoutProvider: string,
+		rightSideWithProvider: string | undefined,
+	): string[] {
+		const minPadding = 2;
+
 		// Prepend the provider in parentheses if there are multiple providers and there's enough room
 		let rightSide = rightSideWithoutProvider;
-		if (this.footerData.getAvailableProviderCount() > 1 && state.model) {
-			rightSide = `(${state.model!.provider}) ${rightSideWithoutProvider}`;
+		if (rightSideWithProvider !== undefined) {
+			rightSide = rightSideWithProvider;
 			if (statsLeftWidth + minPadding + visibleWidth(rightSide) > width) {
 				// Too wide, fall back
 				rightSide = rightSideWithoutProvider;
@@ -284,19 +339,6 @@ export class FooterComponent implements Component {
 		const dimRemainder = theme.fg("dim", remainder);
 
 		const pwdLine = truncateToWidth(theme.fg("dim", pwd), width, theme.fg("dim", "..."));
-		const lines = [pwdLine, dimStatsLeft + dimRemainder];
-
-		// Add extension statuses on a single line, sorted by key alphabetically
-		const extensionStatuses = this.footerData.getExtensionStatuses();
-		if (extensionStatuses.size > 0) {
-			const sortedStatuses = Array.from(extensionStatuses.entries())
-				.sort(([a], [b]) => a.localeCompare(b))
-				.map(([, text]) => sanitizeStatusText(text));
-			const statusLine = sortedStatuses.join(" ");
-			// Truncate to terminal width with dim ellipsis for consistency with footer style
-			lines.push(truncateToWidth(statusLine, width, theme.fg("dim", "...")));
-		}
-
-		return lines;
+		return [pwdLine, dimStatsLeft + dimRemainder];
 	}
 }

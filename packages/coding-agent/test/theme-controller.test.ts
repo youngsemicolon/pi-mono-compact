@@ -83,7 +83,7 @@ describe("InteractiveThemeController", () => {
 				answer = resolve;
 			}),
 		);
-		const controller = createController(ui, () => SettingsManager.inMemory());
+		const controller = createController(ui, () => SettingsManager.inMemory({ theme: "system" }));
 		controller.applyFromSettings();
 
 		// Grayscale until the terminal answers.
@@ -102,7 +102,7 @@ describe("InteractiveThemeController", () => {
 			lateReply = options.onLateReply!;
 			return {};
 		});
-		const controller = createController(ui, () => SettingsManager.inMemory());
+		const controller = createController(ui, () => SettingsManager.inMemory({ theme: "system" }));
 		controller.applyFromSettings();
 		await flush();
 		expect(theme.getFgAnsi("error")).toBe("\x1b[38;5;1m");
@@ -127,10 +127,28 @@ describe("InteractiveThemeController", () => {
 		expect(theme.name).toBe("dark");
 	});
 
+	it("uses the monochrome pair without a theme setting and follows the terminal's appearance", async () => {
+		const { ui, queryTerminalColors, setTerminalColorSchemeNotifications, emitTerminalColorScheme } = createUi();
+		queryTerminalColors.mockResolvedValue(LIGHT);
+		const controller = createController(ui, () => SettingsManager.inMemory());
+		controller.applyFromSettings();
+		expect(setTerminalColorSchemeNotifications).toHaveBeenCalledWith(true);
+		await flush();
+		expect(theme.name).toBe("mono-light");
+		expect(theme.monochrome).toBe(true);
+		expect(controller.getThemeSelection()).toBe("mono-light/mono-dark");
+
+		queryTerminalColors.mockResolvedValue(DARK);
+		emitTerminalColorScheme("dark");
+		await flush();
+		expect(theme.name).toBe("mono-dark");
+		expect(theme.monochrome).toBe(true);
+	});
+
 	it("uses the reported scheme for the system theme when the terminal reports no colors", async () => {
 		vi.stubEnv("COLORFGBG", "");
 		const { ui, emitTerminalColorScheme } = createUi();
-		const controller = createController(ui, () => SettingsManager.inMemory());
+		const controller = createController(ui, () => SettingsManager.inMemory({ theme: "system" }));
 		controller.applyFromSettings();
 		await flush();
 		expect(theme.appearance).toBe("dark");

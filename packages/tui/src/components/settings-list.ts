@@ -107,7 +107,6 @@ export class SettingsList implements Component {
 
 		if (this.searchEnabled && this.searchInput) {
 			lines.push(...this.searchInput.render(width));
-			lines.push("");
 		}
 
 		if (this.items.length === 0) {
@@ -187,7 +186,6 @@ export class SettingsList implements Component {
 				const result = this.searchInput.handleMouse?.(event);
 				return result ? { ...result, focus: true } : undefined;
 			}
-			if (event.y === 1) return undefined;
 		}
 
 		const displayItems = this.getDisplayItems();
@@ -201,7 +199,8 @@ export class SettingsList implements Component {
 		// Hover must not change selection: the visible range is centered on it.
 		if (event.button !== "left" || (event.type !== "press" && event.type !== "click")) return undefined;
 
-		const rowOffset = this.searchEnabled ? 2 : 0;
+		// Items start right below the search input.
+		const rowOffset = this.searchEnabled ? 1 : 0;
 		const { startIndex, endIndex } = this.getVisibleRange(displayItems);
 		const itemIndex = startIndex + event.y - rowOffset;
 		if (itemIndex < startIndex || itemIndex >= endIndex) return undefined;
@@ -313,7 +312,6 @@ export class SettingsList implements Component {
 	}
 
 	private addHintLine(lines: string[], width: number): void {
-		lines.push("");
 		lines.push(
 			truncateToWidth(
 				this.theme.hint(

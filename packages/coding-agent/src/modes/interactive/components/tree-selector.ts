@@ -5,7 +5,6 @@ import {
 	getKeybindings,
 	Input,
 	type Keybinding,
-	Spacer,
 	sliceByColumn,
 	Text,
 	truncateToWidth,
@@ -1380,16 +1379,13 @@ export class TreeSelectorComponent extends Container implements Focusable {
 
 		this.labelInputContainer = new Container();
 
-		this.addChild(new Spacer(1));
 		this.addChild(new DynamicBorder());
 		this.addChild(new Text(theme.bold("  Session Tree"), 1, 0));
 		this.addChild(new TreeHelp());
 		this.addChild(new SearchLine(this.treeList));
 		this.addChild(new DynamicBorder());
-		this.addChild(new Spacer(1));
 		this.addChild(this.treeContainer);
 		this.addChild(this.labelInputContainer);
-		this.addChild(new Spacer(1));
 		this.addChild(new DynamicBorder());
 
 		if (tree.length === 0) {

@@ -92,6 +92,10 @@ function createSession(options: {
 	return session as unknown as AgentSession;
 }
 
+function usage(input: number): AssistantUsage {
+	return { input, output: 10, cacheRead: 0, cacheWrite: 0, cost: { total: 0 } };
+}
+
 function createFooterData(providerCount: number): ReadonlyFooterDataProvider {
 	const provider = {
 		getGitBranch: () => "main",
@@ -157,6 +161,28 @@ describe("FooterComponent width handling", () => {
 		}
 	});
 
+	it("fits the directory, stats, and model on one line when they fit the width", () => {
+		const session = createSession({ sessionName: "", usage: usage(1_234) });
+		const footer = new FooterComponent(session, createFooterData(2));
+
+		const lines = footer.render(120).map(stripAnsi);
+
+		expect(lines).toHaveLength(1);
+		expect(lines[0]).toMatch(/^\/tmp\/project \(main\) · ↑1\.2k .* 12\.3%\/200k \(auto\) +\(test\) test-model$/);
+		expect(visibleWidth(lines[0])).toBe(120);
+	});
+
+	it("falls back to the directory and stats on separate lines when one line is too narrow", () => {
+		const session = createSession({ sessionName: "", usage: usage(1_234) });
+		const footer = new FooterComponent(session, createFooterData(1));
+
+		const lines = footer.render(40).map(stripAnsi);
+
+		expect(lines).toHaveLength(2);
+		expect(lines[0]).toBe("/tmp/project (main)");
+		expect(lines[1]).toMatch(/^↑1\.2k .*test-model$/);
+	});
+
 	it("shows the physical model a virtual model routed to", () => {
 		const session = createSession({
 			sessionName: "",
@@ -167,7 +193,7 @@ describe("FooterComponent width handling", () => {
 		});
 		const footer = new FooterComponent(session, createFooterData(1));
 
-		const statsLine = stripAnsi(footer.render(120)[1]);
+		const statsLine = stripAnsi(footer.render(120).join("\n"));
 
 		expect(statsLine).toContain("auto \u2022 high \u2192 gpt-5.6-luna \u2022 medium");
 	});
@@ -206,7 +232,7 @@ describe("FooterComponent width handling", () => {
 		});
 		const footer = new FooterComponent(session, createFooterData(1));
 
-		const statsLine = stripAnsi(footer.render(120)[1]);
+		const statsLine = stripAnsi(footer.render(120).join("\n"));
 		expect(statsLine).toContain("$1.250");
 	});
 
@@ -214,10 +240,10 @@ describe("FooterComponent width handling", () => {
 		const usage = { input: 10, output: 1, cacheRead: 0, cacheWrite: 0, cost: { total: 0.5 } };
 		const session = createSession({ sessionName: "", usage });
 		const footer = new FooterComponent(session, createFooterData(1));
-		expect(stripAnsi(footer.render(120)[1])).toContain("$0.500");
+		expect(stripAnsi(footer.render(120).join("\n"))).toContain("$0.500");
 
 		session.sessionManager.getEntries().push({ type: "message", message: { role: "assistant", usage } } as never);
-		expect(stripAnsi(footer.render(120)[1])).toContain("$1.000");
+		expect(stripAnsi(footer.render(120).join("\n"))).toContain("$1.000");
 	});
 
 	it("shows the latest cache hit rate when cache usage is present", () => {
@@ -233,7 +259,7 @@ describe("FooterComponent width handling", () => {
 		});
 		const footer = new FooterComponent(session, createFooterData(1));
 
-		const statsLine = stripAnsi(footer.render(120)[1]);
+		const statsLine = stripAnsi(footer.render(120).join("\n"));
 		expect(statsLine).toContain("CH25.0%");
 	});
 
@@ -251,14 +277,14 @@ describe("FooterComponent width handling", () => {
 		});
 		const footer = new FooterComponent(session, createFooterData(1));
 
-		expect(stripAnsi(footer.render(120)[1])).toContain("$1.234 (sub)");
+		expect(stripAnsi(footer.render(120).join("\n"))).toContain("$1.234 (sub)");
 	});
 
 	it("marks explicitly identified subscription auth", () => {
 		const session = createSession({ sessionName: "", provider: "anthropic", usingSubscription: true });
 		const footer = new FooterComponent(session, createFooterData(1));
 
-		expect(stripAnsi(footer.render(120)[1])).toContain("$0.000 (sub)");
+		expect(stripAnsi(footer.render(120).join("\n"))).toContain("$0.000 (sub)");
 	});
 
 	it("does not mark generic OAuth sign-in as a subscription", () => {
@@ -274,7 +300,7 @@ describe("FooterComponent width handling", () => {
 			},
 		});
 		const footer = new FooterComponent(session, createFooterData(1));
-		const stats = stripAnsi(footer.render(120)[1]);
+		const stats = stripAnsi(footer.render(120).join("\n"));
 
 		expect(stats).toContain("$1.234");
 		expect(stats).not.toContain("(sub)");

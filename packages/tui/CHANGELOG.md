@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- `SettingsList` no longer adds blank lines after its search input and before its hint line.
+
 ## [1.0.0] - 2026-10-01
 
 ### Added

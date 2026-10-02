@@ -6,8 +6,9 @@
  * definition, so the tool's public shape is unchanged.
  */
 
-import { Box, Container, Spacer, Text } from "@earendil-works/pi-tui";
+import { Container, Text } from "@earendil-works/pi-tui";
 import { renderDiff } from "../../../modes/interactive/components/diff.ts";
+import { ToolBlock, type ToolBlockStatus } from "../../../modes/interactive/components/tool-block.ts";
 import type { Theme } from "../../../modes/interactive/theme/theme.ts";
 import type { ToolDefinition } from "../../extensions/types.ts";
 import type { EditToolDetails } from "../edit.ts";
@@ -29,22 +30,24 @@ type EditToolResultLike = {
 	content: Array<{ type: string; text?: string; data?: string; mimeType?: string }>;
 	details?: EditToolDetails;
 };
-type EditCallRenderComponent = Box & {
+type EditCallRenderComponent = ToolBlock & {
 	preview?: EditPreview;
 	previewArgsKey?: string;
 	previewPending?: boolean;
 	settledError?: boolean;
 };
 function createEditCallRenderComponent(): EditCallRenderComponent {
-	return Object.assign(new Box(1, 1, (text: string) => text), {
+	const component: EditCallRenderComponent = Object.assign(new ToolBlock(() => "pending"), {
 		preview: undefined as EditPreview | undefined,
 		previewArgsKey: undefined as string | undefined,
 		previewPending: false,
 		settledError: false,
 	});
+	component.setStatus(() => getEditStatus(component.preview, component.settledError));
+	return component;
 }
 function getEditCallRenderComponent(state: EditRenderState, lastComponent: unknown): EditCallRenderComponent {
-	if (lastComponent instanceof Box) {
+	if (lastComponent instanceof ToolBlock) {
 		const component = lastComponent as EditCallRenderComponent;
 		state.callComponent = component;
 		return component;
@@ -112,21 +115,10 @@ function formatEditResult(
 
 	return undefined;
 }
-function getEditHeaderBg(
-	preview: EditPreview | undefined,
-	settledError: boolean | undefined,
-	theme: Theme,
-): (text: string) => string {
-	if (preview) {
-		if ("error" in preview) {
-			return (text: string) => theme.bg("toolErrorBg", text);
-		}
-		return (text: string) => theme.bg("toolSuccessBg", text);
-	}
-	if (settledError) {
-		return (text: string) => theme.bg("toolErrorBg", text);
-	}
-	return (text: string) => theme.bg("toolPendingBg", text);
+/** The block's glyph follows the diff preview, which is ready before the edit runs. */
+function getEditStatus(preview: EditPreview | undefined, settledError: boolean | undefined): ToolBlockStatus {
+	if (preview) return "error" in preview ? "error" : "success";
+	return settledError ? "error" : "pending";
 }
 function buildEditCallComponent(
 	component: EditCallRenderComponent,
@@ -134,7 +126,6 @@ function buildEditCallComponent(
 	theme: Theme,
 	cwd: string,
 ): EditCallRenderComponent {
-	component.setBgFn(getEditHeaderBg(component.preview, component.settledError, theme));
 	component.clear();
 	component.addChild(new Text(formatEditCall(args, theme, cwd), 0, 0));
 
@@ -144,7 +135,6 @@ function buildEditCallComponent(
 
 	const body =
 		"error" in component.preview ? theme.fg("error", component.preview.error) : renderDiff(component.preview.diff);
-	component.addChild(new Spacer(1));
 	component.addChild(new Text(body, 0, 0));
 	return component;
 }
@@ -231,8 +221,8 @@ export const editRenderers: Pick<ToolDefinition<any, any>, "renderCall" | "rende
 		if (!output) {
 			return component;
 		}
-		component.addChild(new Spacer(1));
-		component.addChild(new Text(output, 1, 0));
+		// Aligned with the body of the call block above.
+		component.addChild(new Text(output, 5, 0));
 		return component;
 	},
 };

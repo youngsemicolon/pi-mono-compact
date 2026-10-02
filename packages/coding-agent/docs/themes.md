@@ -1,10 +1,16 @@
 # Customize Pi with themes
 
-Themes control the colors Pi uses in interactive mode and HTML exports. Pi includes the `system`, `dark`, and `light` themes. You can select one theme, follow your terminal's light or dark appearance, or create your own palette.
+Themes control the colors Pi uses in interactive mode and HTML exports. Pi includes the `mono-dark`, `mono-light`, `system`, `dark`, and `light` themes. You can select one theme, follow your terminal's light or dark appearance, or create your own palette.
+
+## Monochrome default
+
+Without a `theme` setting, Pi uses the monochrome pair: `mono-dark` on dark terminals and `mono-light` on light ones, as if the setting were `"mono-light/mono-dark"`. Both use grays only. Emphasis comes from lightness, bold text, and glyphs instead of hue: tool calls show `○` while running, `●` when done, and `✗` when they failed, and diffs mark lines with `+` and `-`.
+
+Under a monochrome theme the logo is drawn in the theme's grays. Under the colored themes it keeps its brand colors.
 
 ## Use your terminal's colors
 
-The `system` theme is the default. It builds Pi's colors from your terminal's theme, so Pi matches the terminal instead of bringing its own palette:
+The `system` theme builds Pi's colors from your terminal's theme, so Pi matches the terminal instead of bringing its own palette:
 
 - Pi queries the terminal's default foreground and background colors and its 16 ANSI colors.
 - Each Pi color takes its hue from one ANSI color, for example errors from red and links from blue.
@@ -35,7 +41,7 @@ The selection is saved as the `theme` [setting](settings.md#terminal-and-display
 }
 ```
 
-Without a `theme` setting, Pi uses `system`.
+Without a `theme` setting, Pi uses `mono-dark` or `mono-light`, depending on the terminal's appearance.
 
 Automatic mode stores the light theme first and the dark theme second:
 

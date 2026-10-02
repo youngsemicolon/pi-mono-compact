@@ -188,20 +188,21 @@ describe("mouse-aware components", () => {
 				{ enableSearch: true },
 			);
 			list.selectItem("item-5");
-			list.handleMouse({ ...mouse("wheel", 1, row + 2), wheelDelta: 1 });
+			// Items start on the row right below the search input.
+			list.handleMouse({ ...mouse("wheel", 1, row + 1), wheelDelta: 1 });
 			const before = list.render(80);
-			assert.match(before[4], /^> Item 6/);
-			assert.match(before[row + 2], new RegExp(`Item ${4 + row} `));
+			assert.match(before[3], /^> Item 6/);
+			assert.match(before[row + 1], new RegExp(`Item ${4 + row} `));
 
 			for (const y of [0, 1, 2, 3, 4, row]) {
-				assert.strictEqual(list.handleMouse({ ...mouse("move", 1, y + 2), button: "none" }), undefined);
+				assert.strictEqual(list.handleMouse({ ...mouse("move", 1, y + 1), button: "none" }), undefined);
 				assert.deepStrictEqual(list.render(80), before);
 			}
 			assert.deepStrictEqual(changes, []);
 
-			list.handleMouse(mouse("press", 1, row + 2));
+			list.handleMouse(mouse("press", 1, row + 1));
 			list.render(80);
-			list.handleMouse(mouse("click", 1, row + 2));
+			list.handleMouse(mouse("click", 1, row + 1));
 			assert.deepStrictEqual(changes, [{ id: `item-${4 + row}`, value: "on" }]);
 		});
 	}

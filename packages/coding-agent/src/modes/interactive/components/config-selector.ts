@@ -907,9 +907,7 @@ export class ConfigSelectorComponent extends Container implements Focusable {
 		};
 
 		// Add header
-		this.addChild(new Spacer(1));
 		this.addChild(new DynamicBorder());
-		this.addChild(new Spacer(1));
 		this.header = new ConfigSelectorHeader(this.writeScope, projectModeAvailable);
 		this.addChild(this.header);
 		this.addChild(new Spacer(1));
@@ -935,7 +933,6 @@ export class ConfigSelectorComponent extends Container implements Focusable {
 		this.addChild(this.resourceList);
 
 		// Bottom border
-		this.addChild(new Spacer(1));
 		this.addChild(new DynamicBorder());
 	}
 

@@ -50,7 +50,6 @@ export class TrustSelectorComponent extends Container {
 		this.onCancelCallback = options.onCancel;
 
 		this.addChild(new DynamicBorder());
-		this.addChild(new Spacer(1));
 		this.addChild(new Text(theme.fg("accent", theme.bold("Project trust")), 1, 0));
 		this.addChild(new Text(theme.fg("muted", options.cwd), 1, 0));
 		this.addChild(new Spacer(1));
@@ -83,7 +82,6 @@ export class TrustSelectorComponent extends Container {
 				0,
 			),
 		);
-		this.addChild(new Spacer(1));
 		this.addChild(new DynamicBorder());
 
 		this.updateList();

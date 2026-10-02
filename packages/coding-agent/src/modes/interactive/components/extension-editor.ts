@@ -65,7 +65,6 @@ export class ExtensionEditorComponent extends Container implements Focusable {
 
 		// Add top border
 		this.addChild(new DynamicBorder());
-		this.addChild(new Spacer(1));
 
 		// Add title and optional description
 		this.addChild(new Text(theme.fg("accent", title), 1, 0));

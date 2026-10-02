@@ -98,7 +98,6 @@ export class ModelSelectorComponent extends Container implements Focusable {
 
 		// Add top border
 		this.addChild(new DynamicBorder());
-		this.addChild(new Spacer(1));
 
 		// Add hint about model filtering
 		if (scopedModels.length > 0) {
@@ -110,7 +109,6 @@ export class ModelSelectorComponent extends Container implements Focusable {
 			const hintText = "Only showing models from configured providers. Use /login to add providers.";
 			this.addChild(new Text(theme.fg("warning", hintText), 0, 0));
 		}
-		this.addChild(new Spacer(1));
 
 		// Create search input
 		this.searchInput = new Input();
@@ -124,8 +122,6 @@ export class ModelSelectorComponent extends Container implements Focusable {
 			}
 		};
 		this.addChild(this.searchInput);
-
-		this.addChild(new Spacer(1));
 
 		// Create list container
 		this.listContainer = new Container();

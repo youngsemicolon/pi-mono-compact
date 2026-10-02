@@ -38,12 +38,12 @@ export class UserMessageComponent extends Container {
 	private rebuild(): void {
 		this.clear();
 		// The Markdown pads and colors its own background: a Box around it would keep a second full-width copy of every
-		// line, with identical output.
+		// line, with identical output. No vertical padding: the panel color alone sets the prompt apart.
 		this.addChild(
 			new Markdown(
 				this.text,
 				this.outputPad,
-				1,
+				0,
 				this.markdownTheme,
 				{
 					color: (content: string) => theme.fg("userMessageText", content),
@@ -64,6 +64,12 @@ export class UserMessageComponent extends Container {
 			return lines;
 		}
 
+		// Markers go at line starts: after the end of a full-width styled line, some terminals lose the next line (#3090).
+		// A one-line message gets an empty zone at its start, which still marks it for prompt navigation.
+		if (lines.length === 1) {
+			lines[0] = OSC133_ZONE_START + OSC133_ZONE_END + OSC133_ZONE_FINAL + lines[0];
+			return lines;
+		}
 		lines[0] = OSC133_ZONE_START + lines[0];
 		lines[lines.length - 1] = OSC133_ZONE_END + OSC133_ZONE_FINAL + lines[lines.length - 1];
 		return lines;

@@ -30,6 +30,7 @@ import { highlight, supportsLanguage } from "../../../utils/syntax-highlight.ts"
 import { stripBom } from "../../../utils/text.ts";
 import { generateSystemThemeColors, SYSTEM_THEME_NAME, terminalAppearance } from "./system-theme.ts";
 
+export { DEFAULT_THEME_SETTING } from "./default-theme.ts";
 export { SYSTEM_THEME_NAME } from "./system-theme.ts";
 
 // ============================================================================
@@ -239,6 +240,9 @@ function detectAppearance(foregrounds: Color[], backgrounds: Color[]): ThemeAppe
 // Theme Class
 // ============================================================================
 
+/** OKLCH chroma below which a color reads as gray. */
+const MONOCHROME_MAX_CHROMA = 0.02;
+
 export class Theme {
 	readonly name?: string;
 	readonly sourcePath?: string;
@@ -254,6 +258,8 @@ export class Theme {
 	// Foreground tokens rendered faint (SGR 2) on top of their color.
 	private readonly dimTokens: ReadonlySet<ThemeColor>;
 	private readonly ownAppearance: ThemeAppearance | undefined;
+	/** Whether every concrete color is a gray. Brand artwork such as the logo renders in grays under such themes. */
+	readonly monochrome: boolean;
 	private resolvedColors: { terminal: TerminalColors; colors: Readonly<Record<ThemeToken, Color>> } | undefined;
 
 	constructor(
@@ -304,6 +310,9 @@ export class Theme {
 			this.bgAnsi.set(token, addToken(token, value, true));
 		}
 		this.ownAppearance = options.appearance ?? detectAppearance(concreteForegrounds, concreteBackgrounds);
+		this.monochrome = [...concreteForegrounds, ...concreteBackgrounds].every(
+			(color) => colorToOklch(color).c < MONOCHROME_MAX_CHROMA,
+		);
 	}
 
 	/**
@@ -442,17 +451,24 @@ export class Theme {
 
 let BUILTIN_THEMES: Record<string, ThemeJson> | undefined;
 
+const BUILTIN_THEME_NAMES = ["dark", "light", "mono-dark", "mono-light"] as const;
+
 function getBuiltinThemes(): Record<string, ThemeJson> {
 	if (!BUILTIN_THEMES) {
 		const themesDir = getThemesDir();
-		const darkPath = path.join(themesDir, "dark.json");
-		const lightPath = path.join(themesDir, "light.json");
-		BUILTIN_THEMES = {
-			dark: JSON.parse(stripBom(fs.readFileSync(darkPath, "utf-8"))) as ThemeJson,
-			light: JSON.parse(stripBom(fs.readFileSync(lightPath, "utf-8"))) as ThemeJson,
-		};
+		BUILTIN_THEMES = Object.fromEntries(
+			BUILTIN_THEME_NAMES.map((name) => [
+				name,
+				JSON.parse(stripBom(fs.readFileSync(path.join(themesDir, `${name}.json`), "utf-8"))) as ThemeJson,
+			]),
+		);
 	}
 	return BUILTIN_THEMES;
+}
+
+/** The default theme for a terminal appearance: `mono-dark` or `mono-light`. */
+export function getDefaultThemeName(terminalTheme: TerminalTheme = getTerminalTheme()): string {
+	return terminalTheme === "light" ? "mono-light" : "mono-dark";
 }
 
 export function getAvailableThemes(): string[] {
@@ -754,7 +770,7 @@ export function setRegisteredThemes(themes: Theme[]): void {
 }
 
 export function initTheme(themeName?: string, enableWatcher: boolean = false): void {
-	const name = themeName ?? SYSTEM_THEME_NAME;
+	const name = themeName ?? getDefaultThemeName();
 	currentThemeName = name;
 	try {
 		setGlobalTheme(loadTheme(name));
@@ -762,9 +778,9 @@ export function initTheme(themeName?: string, enableWatcher: boolean = false): v
 			startThemeWatcher();
 		}
 	} catch (_error) {
-		// Theme is invalid - fall back to the system theme silently
-		currentThemeName = SYSTEM_THEME_NAME;
-		setGlobalTheme(loadTheme(SYSTEM_THEME_NAME));
+		// Theme is invalid - fall back to the default theme silently
+		currentThemeName = getDefaultThemeName();
+		setGlobalTheme(loadTheme(currentThemeName));
 		// Don't start watcher for fallback theme
 	}
 }
@@ -781,9 +797,9 @@ export function setTheme(name: string, enableWatcher: boolean = false): { succes
 		}
 		return { success: true };
 	} catch (error) {
-		// Theme is invalid - fall back to the system theme
-		currentThemeName = SYSTEM_THEME_NAME;
-		setGlobalTheme(loadTheme(SYSTEM_THEME_NAME));
+		// Theme is invalid - fall back to the default theme
+		currentThemeName = getDefaultThemeName();
+		setGlobalTheme(loadTheme(currentThemeName));
 		// Don't start watcher for fallback theme
 		return {
 			success: false,
@@ -809,12 +825,7 @@ function startThemeWatcher(): void {
 	stopThemeWatcher();
 
 	// Only watch if it's a custom theme (not built-in)
-	if (
-		!currentThemeName ||
-		currentThemeName === "dark" ||
-		currentThemeName === "light" ||
-		currentThemeName === SYSTEM_THEME_NAME
-	) {
+	if (!currentThemeName || currentThemeName in getBuiltinThemes() || currentThemeName === SYSTEM_THEME_NAME) {
 		return;
 	}
 
@@ -901,7 +912,7 @@ export function stopThemeWatcher(): void {
  * Used by HTML export to generate CSS custom properties.
  */
 export function getResolvedThemeColors(themeName?: string): Record<string, string> {
-	const colors = loadTheme(themeName ?? currentThemeName ?? SYSTEM_THEME_NAME).colors;
+	const colors = loadTheme(themeName ?? currentThemeName ?? getDefaultThemeName()).colors;
 	return Object.fromEntries(Object.entries(colors).map(([token, color]) => [token, colorToHex(color)]));
 }
 
@@ -909,7 +920,7 @@ export function getResolvedThemeColors(themeName?: string): Record<string, strin
  * Check if a theme is a "light" theme (for CSS that needs light/dark variants).
  */
 export function isLightTheme(themeName?: string): boolean {
-	return loadTheme(themeName ?? currentThemeName ?? SYSTEM_THEME_NAME).appearance === "light";
+	return loadTheme(themeName ?? currentThemeName ?? getDefaultThemeName()).appearance === "light";
 }
 
 /**
@@ -921,7 +932,7 @@ export function getThemeExportColors(themeName?: string): {
 	cardBg?: string;
 	infoBg?: string;
 } {
-	const name = themeName ?? currentThemeName ?? SYSTEM_THEME_NAME;
+	const name = themeName ?? currentThemeName ?? getDefaultThemeName();
 	if (name === SYSTEM_THEME_NAME) return {};
 	try {
 		const themeJson = loadThemeJson(name);
@@ -1134,7 +1145,8 @@ export function getMarkdownTheme(): MarkdownTheme {
 export function getSelectListTheme(): SelectListTheme {
 	return {
 		selectedPrefix: (text: string) => theme.fg("accent", text),
-		selectedText: (text: string) => theme.fg("accent", text),
+		// Bold keeps the selection visible without relying on hue, e.g. in monochrome themes.
+		selectedText: (text: string) => theme.bold(theme.fg("accent", text)),
 		description: (text: string) => theme.fg("muted", text),
 		scrollInfo: (text: string) => theme.fg("muted", text),
 		noMatch: (text: string) => theme.fg("muted", text),
@@ -1150,7 +1162,7 @@ export function getEditorTheme(): EditorTheme {
 
 export function getSettingsListTheme(): SettingsListTheme {
 	return {
-		label: (text: string, selected: boolean) => (selected ? theme.fg("accent", text) : text),
+		label: (text: string, selected: boolean) => (selected ? theme.bold(theme.fg("accent", text)) : text),
 		value: (text: string, selected: boolean) => (selected ? theme.fg("accent", text) : theme.fg("muted", text)),
 		description: (text: string) => theme.fg("dim", text),
 		cursor: theme.fg("accent", "→ "),

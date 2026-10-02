@@ -1,10 +1,21 @@
-import { backgroundAnsi, foregroundAnsi, isAppleTerminalSession, rgbColor } from "@earendil-works/pi-tui";
+import { backgroundAnsi, type Color, foregroundAnsi, isAppleTerminalSession, rgbColor } from "@earendil-works/pi-tui";
 import { theme } from "../theme/theme.ts";
 
 const CORAL = rgbColor(228, 138, 122);
 const BLUE = rgbColor(79, 142, 179);
 const YELLOW = rgbColor(234, 182, 93);
 const RESET = "\x1b[0m";
+
+/**
+ * The logo's three colors. The brand colors stay fixed across colored themes; monochrome themes get
+ * their own grays, ordered like the brand colors' lightness (blue darkest, yellow lightest) so the
+ * three parts of the mark stay distinguishable.
+ */
+function logoColors(): { coral: Color; blue: Color; yellow: Color } {
+	if (!theme.monochrome) return { coral: CORAL, blue: BLUE, yellow: YELLOW };
+	const colors = theme.colors;
+	return { coral: colors.text, blue: colors.muted, yellow: colors.accent };
+}
 
 /**
  * The pi logo: 4 cells wide and 2 lines tall. Each cell shows two square pixels with half blocks:
@@ -14,14 +25,15 @@ const RESET = "\x1b[0m";
  *   blue  blue  .     yellow
  *   blue  .     .     yellow
  *
- * The brand colors stay fixed across themes; they follow the terminal's color mode.
+ * The colors follow the terminal's color mode.
  */
 export function piLogoLines(): [string, string] {
 	const mode = theme.getColorMode();
-	const fg = (color: typeof CORAL) => foregroundAnsi(color, mode);
+	const { coral, blue, yellow } = logoColors();
+	const fg = (color: Color) => foregroundAnsi(color, mode);
 	// The fourth cell of the top line is empty, so it is padded to the same width as the bottom line.
-	const top = `${fg(CORAL)}${backgroundAnsi(BLUE, mode)}▀${RESET}${fg(CORAL)}▀█${RESET} `;
-	const bottom = `${fg(BLUE)}█▀${RESET} ${fg(YELLOW)}█${RESET}`;
+	const top = `${fg(coral)}${backgroundAnsi(blue, mode)}▀${RESET}${fg(coral)}▀█${RESET} `;
+	const bottom = `${fg(blue)}█▀${RESET} ${fg(yellow)}█${RESET}`;
 	return [top, bottom];
 }
 
@@ -36,5 +48,6 @@ export function supportsPiLogo(): boolean {
 /** Text fallback for the logo: "Pi" with the logo's coral and yellow. */
 export function piWordmark(): string {
 	const mode = theme.getColorMode();
-	return `${foregroundAnsi(CORAL, mode)}P${RESET}${foregroundAnsi(YELLOW, mode)}i${RESET}`;
+	const { coral, yellow } = logoColors();
+	return `${foregroundAnsi(coral, mode)}P${RESET}${foregroundAnsi(yellow, mode)}i${RESET}`;
 }

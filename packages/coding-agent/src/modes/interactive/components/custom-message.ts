@@ -32,8 +32,8 @@ export class CustomMessageComponent extends Container {
 
 		this.addChild(new Spacer(1));
 
-		// Create box with purple background (used for default rendering)
-		this.box = new Box(1, 1, (t) => theme.bg("customMessageBg", t));
+		// Box with the custom message background (used for default rendering), without vertical padding
+		this.box = new Box(1, 0, (t) => theme.bg("customMessageBg", t));
 
 		this.rebuild();
 	}
@@ -91,7 +91,6 @@ export class CustomMessageComponent extends Container {
 		// Default rendering: label + content
 		const label = theme.fg("customMessageLabel", `\x1b[1m[${this.message.customType}]\x1b[22m`);
 		this.box.addChild(new Text(label, 0, 0));
-		this.box.addChild(new Spacer(1));
 
 		// Extract text content
 		let text: string;
