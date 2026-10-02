@@ -14,6 +14,7 @@ session itself: `demo-provider.ts` is an extension that registers a deterministi
 | `verify-extension.sh` | Installs the Pi package with `pi install` into a clean, isolated Pi setup, runs a scripted session, checks the result (compact blocks, monochrome theme, unchanged tool set and saved settings), and removes it again. |
 | `capture-header.sh` | Captures the startup header of several pi commands (e.g. an older release and this fork) in isolated, clean setups and stacks them into one image. |
 | `ansi-to-png.mjs` | Renders `tmux capture-pane -e` output to HTML and, with playwright-core, to PNG. |
+| `assets/` | Monochrome versions of the README logo (`https://pi.dev/logo-auto.svg`): identical paths, gray fills. `pi-logo-mono-dark.svg` and `pi-logo-mono-light.svg` are picked by GitHub's color scheme; `pi-logo-mono.svg` is the fallback and keeps at least 3:1 contrast on white and on GitHub's dark background. |
 | `screenshots/` | The committed evidence set. |
 
 ## Reproduce

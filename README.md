@@ -1,6 +1,10 @@
 <p align="center">
   <a href="https://pi.dev">
-    <img alt="pi logo" src="https://pi.dev/logo-auto.svg" width="128">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="compact/assets/pi-logo-mono-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="compact/assets/pi-logo-mono-light.svg">
+      <img alt="pi logo" src="compact/assets/pi-logo-mono.svg" width="128">
+    </picture>
   </a>
 </p>
 <p align="center">
