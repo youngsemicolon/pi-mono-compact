@@ -1,0 +1,31 @@
+# compact/verify-extension.sh <stock pi 1.0.0 from npm> git:github.com/youngsemicolon/pi-mono-compact@pi-package
+# Clean setup: isolated HOME with no settings, credentials, or packages; env -i (no API keys); 2026-10-02 UTC
+
+pi: 1.0.0
+$ pi install git:github.com/youngsemicolon/pi-mono-compact@pi-package
+Installing git:github.com/youngsemicolon/pi-mono-compact@pi-package...
+Cloning into '~/.pi/agent/git/github.com/youngsemicolon/pi-mono-compact'...
+Switched to a new branch 'pi-package'
+branch 'pi-package' set up to track 'origin/pi-package'.
+Installed git:github.com/youngsemicolon/pi-mono-compact@pi-package
+install took 8s
+User packages:
+  git:github.com/youngsemicolon/pi-mono-compact@pi-package
+    ~/.pi/agent/git/github.com/youngsemicolon/pi-mono-compact
+PASS  pi list shows the package
+PASS  loaded resources list the package's extensions
+PASS  tool calls render as compact blocks
+PASS  running tool shows the pending glyph
+PASS  the edit diff and test output are shown
+PASS  theme is monochrome
+PASS  saved theme setting unchanged
+PASS  model sees the default tools only (bash,edit,read,write)
+$ pi remove git:github.com/youngsemicolon/pi-mono-compact
+Removing git:github.com/youngsemicolon/pi-mono-compact...
+Removed git:github.com/youngsemicolon/pi-mono-compact
+No packages installed.
+PASS  pi remove uninstalls the package
+9 passed, 0 failed
+
+# /reload in an already running session (stock pi, installed from the same source):
+# extensions loaded after /reload; theme colors after reload: 4 grays (mono-dark), plus the stock logo's 3 brand colors

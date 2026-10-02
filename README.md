@@ -26,7 +26,7 @@ Then start Pi, or run `/reload` in a session that is already open. Nothing else 
 pi remove git:github.com/youngsemicolon/pi-mono-compact
 ```
 
-The extension is the [`extension/`](extension/README.md) package, published on the [`pi-package`](https://github.com/youngsemicolon/pi-mono-compact/tree/pi-package) branch. It was tested with stock Pi 1.0.0 in a clean setup ([results](compact/screenshots/extension-verify.txt)). Prompt, dialog, `!` command, startup, and footer compaction need the full fork below, because extensions cannot change those parts of Pi.
+The extension is the [`extension/`](extension/README.md) package, published on the [`pi-package`](https://github.com/youngsemicolon/pi-mono-compact/tree/pi-package) branch. It was tested with stock Pi 1.0.0 in a clean setup ([results](compact/screenshots/extension-verify.txt), [screenshot](compact/screenshots/extension-running.png)). Prompt, dialog, `!` command, startup, and footer compaction need the full fork below, because extensions cannot change those parts of Pi.
 
 ![Before and after: the same scripted session in a 100x62 terminal](compact/screenshots/compare-session.png)
 
